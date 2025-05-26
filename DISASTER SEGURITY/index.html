@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disaster Security</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <button class="cerrar-sidebar" onclick="toggleSidebar()">
+    <img src="exit.png" alt="Cerrar" class="exit.png" />
+  </button>
+  <button onclick="mostrarVista('formulario')">Formulario</button>
+  <button onclick="mostrarVista('perfil'); cargarPerfil();">Perfil</button>
+  <button onclick="mostrarVista('mapa'); inicializarMapa();">Mapa</button>
+  <button onclick="mostrarVista('notificaciones')">Notificaciones</button>
+  <button onclick="mostrarVista('biblioteca')">Biblioteca</button>
+    <button onclick="mostrarVista('planesEvacuacion')">Planes de Evacuación</button>
+
+</div>
+
+<!-- INICIO -->
+<div id="inicio" class="pantalla">
+  <div class="top-bar">
+    <div id="logo">DISASTER</div>
+    <div class="top-buttons">
+      <button onclick="mostrarVista('login')">Iniciar Sesión</button>
+      <button onclick="mostrarVista('registro')">Registrar</button>
+    </div>
+  </div>
+
+  <div class="main-title">
+    <h1>DISASTER SECURITY</h1>
+    <p>APP PARA MEJORAR LA SEGURIDAD EN CASOS DE EMERGENCIAS Y RIESGOS</p>
+  </div>
+
+  <div class="desastres">
+    <img src="https://cdn.pixabay.com/photo/2016/01/06/22/29/flood-1125953_1280.jpg" alt="Inundación" />
+    <img src="https://cdn.pixabay.com/photo/2017/08/30/05/00/hurricane-harvey-2692440_1280.jpg" alt="Huracán" />
+    <img src="https://cdn.pixabay.com/photo/2012/11/28/10/37/fire-67627_1280.jpg" alt="Incendio" />
+  </div>
+
+  <div class="descripcion">
+    <p>Nuestra app ayuda a reportar desastres naturales rápidamente. ¡Actúa rápido y ayuda a salvar vidas!</p>
+  </div>
+
+  <div class="calificaciones">
+    <h3>Calificaciones de Usuarios</h3>
+    <p>⭐⭐⭐⭐⭐ "Muy útil en mi ciudad, reporté una inundación y llegaron rápido." - María G.</p>
+    <p>⭐⭐⭐⭐ "Sencilla de usar y cumple con su propósito." - Andrés R.</p>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="pantalla" style="display: none;">
+  <h2>Iniciar Sesión</h2>
+  <input type="text" id="login-nombre" placeholder="Nombre completo" required />
+  <input type="text" id="login-cedula" placeholder="Cédula" maxlength="10" required />
+  <input type="password" id="login-password" placeholder="Contraseña" required />
+  <button onclick="iniciarSesion()">Entrar</button>
+  <button onclick="mostrarVista('inicio')">Volver</button>
+</div>
+
+<!-- REGISTRO -->
+<div id="registro" class="pantalla" style="display: none;">
+  <h2>Registro</h2>
+  <input type="text" id="nombre" placeholder="Nombres" required />
+  <input type="text" id="apellidos" placeholder="Apellidos" required />
+  <input type="text" id="direccion" placeholder="Dirección" required />
+  <input type="text" id="celular" placeholder="Celular (10 dígitos)" maxlength="10" required />
+  <input type="text" id="cedula" placeholder="Cédula (10 dígitos)" maxlength="10" required />
+  <input type="password" id="password" placeholder="Contraseña" required />
+  <label>Foto de cédula:</label>
+  <input type="file" id="fotoCedula" />
+  <button onclick="registrar()">Registrar</button>
+  <button onclick="mostrarVista('inicio')">Volver</button>
+</div>
+
+<!-- FORMULARIO -->
+<div id="formulario" class="pantalla" style="display: none;">
+  <div class="top-bar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="center-title">DISASTER SECURITY</div>
+  </div>
+
+  <h2>Formulario de Emergencia</h2>
+  <form id="formReporte" enctype="multipart/form-data" onsubmit="event.preventDefault(); enviarReporte();">
+    <label for="tipo">Tipo de emergencia:</label>
+    <select name="tipo" id="tipo" required>
+      <option value="Incendio">Incendio</option>
+      <option value="Inundación">Inundación</option>
+      <option value="Terremoto">Terremoto</option>
+      <option value="Otro">Otro</option>
+    </select>
+
+    <label for="evidencia">Subir evidencia:</label>
+    <input type="file" name="evidencia" id="evidencia" accept="image/*" required />
+
+    <label for="descripcion">Describe la emergencia:</label>
+    <textarea name="descripcion" id="descripcion" rows="4" required></textarea><br>
+
+    <button type="submit">Entregar Reporte</button>
+  </form>
+</div>
+
+<!-- PERFIL -->
+<div id="perfil" class="pantalla" style="display: none;">
+  <div class="top-bar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="center-title">DISASTER SECURITY</div>
+  </div>
+
+  <h2>Mi Perfil</h2>
+  <img id="foto-perfil" class="foto-perfil" src="img/default-user.png" alt="Foto de perfil">
+  <p><strong>Nombre:</strong> <span id="nombrePerfil"></span></p>
+  <p><strong>Apellidos:</strong> <span id="apellidosPerfil"></span></p>
+  <p><strong>Cédula:</strong> <span id="cedulaPerfil"></span></p>
+  <p><strong>Dirección:</strong> <span id="direccionPerfil"></span></p>
+  <p><strong>Celular:</strong> <span id="celularPerfil"></span></p>
+
+  <form id="form-foto">
+    <label>Cambiar foto de perfil:</label>
+    <input type="file" name="foto" required>
+    <button type="submit">Subir Foto</button>
+  </form>
+
+  <br>
+  <button onclick="cerrarSesion()">Cerrar sesión</button>
+</div>
+
+<!-- MAPA -->
+<div id="mapa" class="pantalla" style="display: none;">
+  <div class="top-bar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="center-title">DISASTER SECURITY</div>
+  </div>
+
+  <h2>Mapa de Emergencias</h2>
+  <div id="mapaEmergencias" style="height: 500px; width: 100%; border-radius: 10px;"></div>
+  <div id="controlesMapa" style="margin-top: 20px; padding: 10px; background: #f9fdf6; border-radius: 10px;">
+    <h3>Selecciona tipo de emergencia:</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 10px;">
+      <div><span style="display:inline-block;width:20px;height:20px;background:red;border-radius:50%;margin-right:5px;"></span>Incendio</div>
+      <div><span style="display:inline-block;width:20px;height:20px;background:blue;border-radius:50%;margin-right:5px;"></span>Inundación</div>
+      <div><span style="display:inline-block;width:20px;height:20px;background:brown;border-radius:50%;margin-right:5px;"></span>Terremoto</div>
+      <div><span style="display:inline-block;width:20px;height:20px;background:pink;border-radius:50%;margin-right:5px;"></span>Otro</div>
+    </div>
+
+    <label for="tipoEmergencia"><strong>Tipo de emergencia:</strong></label>
+    <select id="tipoEmergencia" style="margin-left: 10px;">
+      <option value="red">Incendio</option>
+      <option value="blue">Inundación</option>
+      <option value="brown">Terremoto</option>
+      <option value="pink">Otro</option>
+    </select>
+
+    <br><br>
+    <button onclick="enviarAlertaDesdeMapa()" style="padding: 10px 20px; background: #4a8f5a; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      Enviar Alerta
+    </button>
+  </div>
+</div>
+
+<!-- NOTIFICACIONES -->
+<div id="notificaciones" class="pantalla" style="display: none;">
+  <div class="top-bar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="center-title">DISASTER SECURITY</div>
+  </div>
+
+  <h2>Notificaciones (pendiente)</h2>
+  <p>Aquí se mostrarán las notificaciones importantes.</p>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+
+<!-- BIBLIOTECA -->
+<div id="biblioteca" class="pantalla" style="display: none;">
+  <div class="top-bar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="center-title">DISASTER SECURITY</div>
+  </div>
+  <h2>Biblioteca de Recursos</h2>
+  <p>Aquí encontrarás documentos, guías y recursos útiles para actuar ante desastres.</p>
+
+  <h3>Buscar por tipo de desastre:</h3>
+<div style="margin-bottom: 20px;">
+  <button onclick="buscarCategoria('incendios')">🔥 Incendios</button>
+  <button onclick="buscarCategoria('inundaciones')">🌊 Inundaciones</button>
+  <button onclick="buscarCategoria('terremotos')">🌍 Terremotos</button>
+</div>
+
+<input type="text" id="busquedaLibro" placeholder="Buscar libro..." />
+<button onclick="buscarLibro()">Buscar</button>
+
+<div id="resultadosLibros" style="margin-top: 30px;"></div>
+
+<h3>Guías oficiales</h3>
+<ul>
+  <li><a href="https://www.ready.gov/wildfires" target="_blank">🔥 Cómo prepararte ante incendios forestales (FEMA)</a></li>
+  <li><a href="https://www.ready.gov/floods" target="_blank">🌊 Guía oficial para inundaciones</a></li>
+  <li><a href="https://www.ready.gov/earthquakes" target="_blank">🌍 Qué hacer antes, durante y después de un terremoto</a></li>
+</ul>
+
+
+  <!-- Buscador de libros -->
+  <input type="text" id="busquedaLibro" placeholder="Buscar libro..." />
+  <button onclick="buscarLibro()">Buscar</button>
+  <div id="resultadosLibros"></div>
+</div>
+
+<<!-- PLANES DE EVACUACIÓN -->
+<div id="planesEvacuacion" class="pantalla" style="display: none;">
+  <div class="top-bar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="center-title">DISASTER SECURITY</div>
+  </div>
+
+  <h2>Planes de Evacuación</h2>
+  <p style="max-width: 800px; margin: auto; color: #333;">
+    Conoce los pasos y recursos oficiales para evacuar correctamente en caso de emergencia. Aquí encontrarás guías del gobierno colombiano, organismos internacionales y la Cruz Roja.
+  </p>
+
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;">
+
+   <!-- TARJETA 1 (Actualizada) -->
+<div style="background: #ffffff; border: 1px solid #ddd; border-radius: 10px; width: 300px; padding: 20px; text-align: left; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+  <h3>🛑 Plan de Emergencias Familiar</h3>
+  <p>Descarga la guía oficial para crear un plan familiar de evacuación y actuar correctamente ante emergencias.</p>
+  <a href="https://www.ulibertadores.edu.co/wp-content/uploads/Guia-Sura-Oct-05d.pdf" target="_blank" style="color: #4a8f5a; font-weight: bold;">Descargar PDF</a>
+</div>
+
+
+    <!-- TARJETA 2 -->
+    <div style="background: #ffffff; border: 1px solid #ddd; border-radius: 10px; width: 300px; padding: 20px; text-align: left; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+      <h3>🚨 Guía FEMA</h3>
+      <p>Recomendaciones de FEMA para actuar antes, durante y después de evacuar en EE.UU.</p>
+      <a href="https://www.ready.gov/evacuation" target="_blank" style="color: #4a8f5a; font-weight: bold;">Ver guía</a>
+    </div>
+
+    <!-- TARJETA 3 -->
+    <div style="background: #ffffff; border: 1px solid #ddd; border-radius: 10px; width: 300px; padding: 20px; text-align: left; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+      <h3>🧭 Cruz Roja Colombiana</h3>
+      <p>Consejos y capacitaciones sobre planes de emergencia y preparación comunitaria.</p>
+      <a href="https://www.cruzrojacolombiana.org/" target="_blank" style="color: #4a8f5a; font-weight: bold;">Ir al sitio</a>
+    </div>
+
+  </div>
+
+  <div style="margin-top: 40px; max-width: 800px; margin-left: auto; margin-right: auto; background: #f9fdf6; padding: 20px; border-radius: 10px; text-align: left;">
+    <h3>✅ Recomendaciones clave:</h3>
+    <ul style="color: #333; line-height: 1.6;">
+      <li>Ten siempre preparado un <strong>kit de emergencia</strong> con documentos, agua, linterna, botiquín y radio.</li>
+      <li>Define puntos de encuentro familiares y rutas de evacuación seguras.</li>
+      <li>Conoce los números de emergencia de tu ciudad.</li>
+      <li>Participa en simulacros comunitarios al menos una vez al año.</li>
+    </ul>
+  </div>
+</div>
+
+
+
+</body>
+</html>
